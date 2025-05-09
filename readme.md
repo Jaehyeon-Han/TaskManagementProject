@@ -9,4 +9,4 @@
 
 
 # ERD
-![erd](src/main/resources/static/erd.png)
+![erd](images/erd.png)
