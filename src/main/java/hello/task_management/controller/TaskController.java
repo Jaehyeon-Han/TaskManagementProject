@@ -36,17 +36,17 @@ public class TaskController {
             errors.put(fieldName, errorMessage);
         });
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleTaskNotFoundException(TaskNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @PostMapping
@@ -63,18 +63,18 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<TaskResponseDto>> findAllTasks() {
-        return new ResponseEntity<>(taskService.findAllTasks(), HttpStatus.OK);
+        return ResponseEntity.ok(taskService.findAllTasks());
     }
 
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskResponseDto> findTaskById(@PathVariable long taskId) {
-        return new ResponseEntity<>(taskService.findTaskById(taskId), HttpStatus.OK);
+        return ResponseEntity.ok(taskService.findTaskById(taskId));
     }
 
     @PatchMapping("/{taskId}")
     public ResponseEntity<TaskResponseDto> updateTaskById(@PathVariable long taskId, @Valid @RequestBody UpdateTaskDto updateTaskDto) {
         TaskResponseDto taskResponseDto = taskService.updateTaskById(taskId, updateTaskDto);
 
-        return new ResponseEntity<>(taskResponseDto, HttpStatus.OK);
+        return ResponseEntity.ok(taskResponseDto);
     }
 }
