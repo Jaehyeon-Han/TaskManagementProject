@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS tasks;
+
+CREATE TABLE tasks
+(
+    task_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task             VARCHAR(500) NOT NULL,
+    author           VARCHAR(50)  NOT NULL,
+    password         VARCHAR(20)  NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
