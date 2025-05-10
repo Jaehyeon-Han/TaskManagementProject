@@ -1,6 +1,7 @@
 package hello.task_management.controller;
 
 import hello.task_management.dto.request.CreateTaskDto;
+import hello.task_management.dto.request.DeleteTaskDto;
 import hello.task_management.dto.request.UpdateTaskDto;
 import hello.task_management.dto.response.TaskResponseDto;
 import hello.task_management.exception.PasswordMismatchException;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -76,5 +78,13 @@ public class TaskController {
         TaskResponseDto taskResponseDto = taskService.updateTaskById(taskId, updateTaskDto);
 
         return ResponseEntity.ok(taskResponseDto);
+    }
+
+    @DeleteMapping("/{taskId}")
+    @Transactional
+    public ResponseEntity<Void> deleteTaskById(@PathVariable long taskId, @Valid @RequestBody DeleteTaskDto deleteTaskDto) {
+        taskService.deleteTaskById(taskId, deleteTaskDto);
+
+        return ResponseEntity.noContent().build();
     }
 }

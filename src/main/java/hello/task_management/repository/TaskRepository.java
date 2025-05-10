@@ -13,4 +13,6 @@ public interface TaskRepository {
     List<TaskDto> findAllTasks();
 
     int updateTask(TaskDto taskDto);
+
+    void deleteTaskById(long taskId);
 }
