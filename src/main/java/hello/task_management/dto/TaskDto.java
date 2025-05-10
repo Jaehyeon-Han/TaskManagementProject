@@ -10,9 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TaskDto {
     private Long id;
+
     private String task;
     private String author;
+
     private String password;
+
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
 }

@@ -37,7 +37,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Optional<TaskDto> findTaskById(long createdTaskId) {
-        String sql = "SELECT task_id, task, author, created_at, last_modified_at FROM tasks WHERE task_id = ?";
+        String sql = "SELECT task_id, task, author, password, created_at, last_modified_at FROM tasks WHERE task_id = ?";
 
         List<TaskDto> result = jdbcTemplate.query(sql, taskDtoRowMapper(), createdTaskId);
         return result.stream().findAny();
@@ -45,19 +45,25 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<TaskDto> findAllTasks() {
-        String sql = "SELECT task_id, task, author, created_at, last_modified_at FROM tasks ORDER BY last_modified_at DESC";
+        String sql = "SELECT task_id, task, author, password, created_at, last_modified_at FROM tasks ORDER BY last_modified_at DESC";
 
         return jdbcTemplate.query(sql, taskDtoRowMapper());
     }
 
+    @Override
+    public int updateTask(TaskDto taskDto) {
+       String sql = "UPDATE tasks SET task = ?, author = ? WHERE task_id = ?";
+
+       return jdbcTemplate.update(sql, taskDto.getTask(), taskDto.getAuthor(), taskDto.getId());
+    }
+
     private RowMapper<TaskDto> taskDtoRowMapper() {
         return (rs, rowNum) -> {
-            System.out.println(rs.getLong("task_id"));
             return new TaskDto(
                     rs.getLong("task_id"),
                     rs.getString("task"),
                     rs.getString("author"),
-                    null,
+                    rs.getString("password"),
                     rs.getTimestamp("created_at").toLocalDateTime(),
                     rs.getTimestamp("last_modified_at").toLocalDateTime()
             );
