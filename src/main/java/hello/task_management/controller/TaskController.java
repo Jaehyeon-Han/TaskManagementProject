@@ -1,7 +1,9 @@
 package hello.task_management.controller;
 
 import hello.task_management.dto.request.CreateTaskDto;
+import hello.task_management.dto.request.UpdateTaskDto;
 import hello.task_management.dto.response.TaskResponseDto;
+import hello.task_management.exception.PasswordMismatchException;
 import hello.task_management.exception.TaskNotFoundException;
 import hello.task_management.service.TaskService;
 import jakarta.validation.Valid;
@@ -42,6 +44,11 @@ public class TaskController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
     @PostMapping
     public ResponseEntity<TaskResponseDto> createTask(@RequestBody @Valid CreateTaskDto createTaskDto) {
         TaskResponseDto createdTask = taskService.createTask(createTaskDto);
@@ -62,5 +69,12 @@ public class TaskController {
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskResponseDto> findTaskById(@PathVariable long taskId) {
         return new ResponseEntity<>(taskService.findTaskById(taskId), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{taskId}")
+    public ResponseEntity<TaskResponseDto> updateTaskById(@PathVariable long taskId, @Valid @RequestBody UpdateTaskDto updateTaskDto) {
+        TaskResponseDto taskResponseDto = taskService.updateTaskById(taskId, updateTaskDto);
+
+        return new ResponseEntity<>(taskResponseDto, HttpStatus.OK);
     }
 }

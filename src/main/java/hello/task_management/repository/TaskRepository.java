@@ -11,4 +11,6 @@ public interface TaskRepository {
     Optional<TaskDto> findTaskById(long createdTaskId);
 
     List<TaskDto> findAllTasks();
+
+    int updateTask(TaskDto taskDto);
 }

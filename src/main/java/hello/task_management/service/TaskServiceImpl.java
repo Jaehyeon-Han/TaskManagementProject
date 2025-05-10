@@ -6,6 +6,7 @@ import hello.task_management.dto.request.CreateTaskDto;
 import hello.task_management.dto.request.UpdateTaskDto;
 import hello.task_management.dto.response.TaskResponseDto;
 import hello.task_management.dto.response.TaskResponseDtoMapper;
+import hello.task_management.exception.PasswordMismatchException;
 import hello.task_management.exception.TaskNotFoundException;
 import hello.task_management.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,34 @@ public class TaskServiceImpl implements TaskService {
         return allTasks.stream().map(TaskResponseDtoMapper::fromTaskDto).toList();
     }
 
-    private TaskDto findByIdOrThrow(long id) {
-        return taskRepository.findTaskById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task for id " + id + " does not exist"));
+    @Override
+    @Transactional
+    public TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto) {
+        TaskDto taskDto = findByIdOrThrow(taskId);
+
+        if(!updateTaskDto.getPassword().equals(taskDto.getPassword())) {
+            throw new PasswordMismatchException("password does not match");
+        }
+
+        String modifiedTask = updateTaskDto.getTask();
+        if(modifiedTask != null) {
+            taskDto.setTask(modifiedTask);
+        }
+
+        String modifiedAuthor = updateTaskDto.getAuthor();
+        if(modifiedAuthor != null) {
+            taskDto.setAuthor(modifiedAuthor);
+        }
+
+        taskRepository.updateTask(taskDto);
+
+        TaskDto updatedTaskDto = findByIdOrThrow(taskId);
+        return mapTaskDtoToTaskResponseDto(updatedTaskDto);
+    }
+
+    private TaskDto findByIdOrThrow(long taskId) {
+        return taskRepository.findTaskById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task for id " + taskId + " does not exist"));
     }
 
     private TaskResponseDto mapTaskDtoToTaskResponseDto(TaskDto taskDto) {
