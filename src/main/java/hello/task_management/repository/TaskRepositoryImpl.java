@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,25 +45,22 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<TaskDto> findAllTasks() {
-        String sql = "SELECT task_id, task, author, created_at, last_modified_at FROM tasks";
+        String sql = "SELECT task_id, task, author, created_at, last_modified_at FROM tasks ORDER BY last_modified_at DESC";
 
         return jdbcTemplate.query(sql, taskDtoRowMapper());
     }
 
     private RowMapper<TaskDto> taskDtoRowMapper() {
-        return new RowMapper<TaskDto>() {
-            @Override
-            public TaskDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-                System.out.println(rs.getLong("task_id"));
-                return new TaskDto(
-                        rs.getLong("task_id"),
-                        rs.getString("task"),
-                        rs.getString("author"),
-                        null,
-                        rs.getTimestamp("created_at").toLocalDateTime(),
-                        rs.getTimestamp("last_modified_at").toLocalDateTime()
-                );
-            }
+        return (rs, rowNum) -> {
+            System.out.println(rs.getLong("task_id"));
+            return new TaskDto(
+                    rs.getLong("task_id"),
+                    rs.getString("task"),
+                    rs.getString("author"),
+                    null,
+                    rs.getTimestamp("created_at").toLocalDateTime(),
+                    rs.getTimestamp("last_modified_at").toLocalDateTime()
+            );
         };
     }
 }
