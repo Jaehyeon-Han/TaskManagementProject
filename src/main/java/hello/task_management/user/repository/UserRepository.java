@@ -12,5 +12,5 @@ public interface UserRepository {
 
     int updateUser(UserDto userDto);
 
-    Optional<UserDto> findUserById(long taskId);
+    Optional<UserDto> findUserById(long userId);
 }

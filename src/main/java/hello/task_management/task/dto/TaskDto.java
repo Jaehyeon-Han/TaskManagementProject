@@ -12,7 +12,8 @@ public class TaskDto {
     private Long id;
 
     private String task;
-    private String author;
+    private long authorId;
+    private String authorName;
 
     private String password;
 

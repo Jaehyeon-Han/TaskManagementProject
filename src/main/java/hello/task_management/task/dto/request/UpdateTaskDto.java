@@ -10,9 +10,8 @@ public class UpdateTaskDto {
     private String task;
     @NotBlank
     private String password;
-    private String author;
 
     public boolean isEmpty() {
-        return task == null && author == null;
+        return task == null;
     }
 }

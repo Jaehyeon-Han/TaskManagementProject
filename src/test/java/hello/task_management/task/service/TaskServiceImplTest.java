@@ -3,7 +3,7 @@ package hello.task_management.task.service;
 import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
 import hello.task_management.task.dto.response.TaskResponseDto;
-import hello.task_management.global.error.exception.PasswordMismatchException;
+import hello.task_management.global.error.exception.TaskPasswordMismatchException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,6 +81,6 @@ class TaskServiceImplTest {
 
         // when + then
         long taskId = taskResponseDto.getId();
-        assertThrows(PasswordMismatchException.class, () -> taskService.updateTaskById(taskId, updateTaskDto));
+        assertThrows(TaskPasswordMismatchException.class, () -> taskService.updateTaskById(taskId, updateTaskDto));
     }
 }

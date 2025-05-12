@@ -1,6 +1,8 @@
 package hello.task_management.global.error;
 
-import hello.task_management.global.error.exception.PasswordMismatchException;
+import hello.task_management.global.error.exception.TaskPasswordMismatchException;
+import hello.task_management.global.error.exception.UserNotFoundException;
+import hello.task_management.global.error.exception.UserPasswordMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -28,7 +30,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex) {
+    public ResponseEntity<String> handleTaskPasswordMismatchException(TaskPasswordMismatchException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleUserPasswordMismatchException(UserPasswordMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

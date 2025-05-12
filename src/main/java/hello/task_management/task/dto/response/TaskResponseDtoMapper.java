@@ -8,7 +8,8 @@ public class TaskResponseDtoMapper {
 
         taskResponseDto.setId(taskDto.getId());
         taskResponseDto.setTask(taskDto.getTask());
-        taskResponseDto.setAuthor(taskDto.getAuthor());
+        taskResponseDto.setAuthorId(taskDto.getAuthorId());
+        taskResponseDto.setAuthorName(taskDto.getAuthorName());
         taskResponseDto.setCreatedAt(taskDto.getCreatedAt());
         taskResponseDto.setLastModifiedAt(taskDto.getLastModifiedAt());
 

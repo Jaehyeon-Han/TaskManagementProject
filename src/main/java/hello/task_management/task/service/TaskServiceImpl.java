@@ -1,5 +1,7 @@
 package hello.task_management.task.service;
 
+import hello.task_management.global.error.exception.UserNotFoundException;
+import hello.task_management.global.error.exception.UserPasswordMismatchException;
 import hello.task_management.task.dto.TaskDto;
 import hello.task_management.task.dto.TaskDtoMapper;
 import hello.task_management.task.dto.request.CreateTaskDto;
@@ -9,12 +11,15 @@ import hello.task_management.task.dto.response.TaskResponseDto;
 import hello.task_management.task.dto.response.TaskResponseDtoMapper;
 import hello.task_management.global.error.exception.TaskNotFoundException;
 import hello.task_management.task.repository.TaskRepository;
+import hello.task_management.user.dto.UserDto;
+import hello.task_management.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static hello.task_management.global.validation.PasswordMatcher.checkPasswordMatchOrThrowPasswordMismatch;
 
@@ -22,14 +27,29 @@ import static hello.task_management.global.validation.PasswordMatcher.checkPassw
 @RequiredArgsConstructor
 public class TaskServiceImpl implements hello.task_management.task.service.TaskService {
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @Override
     public TaskResponseDto createTask(CreateTaskDto createTaskDto) {
+        authenticateAuthorOrThrowUserPasswordMismatchException(createTaskDto.getAuthorId(), createTaskDto.getAuthorPassword());
+
         TaskDto newTaskDto = TaskDtoMapper.fromCreateTaskDto(createTaskDto);
         long createdTaskId = taskRepository.createTask(newTaskDto);
 
         TaskDto createdTask = findByIdOrThrowTaskNotFound(createdTaskId);
         return mapTaskDtoToTaskResponseDto(createdTask);
+    }
+
+    private void authenticateAuthorOrThrowUserPasswordMismatchException(Long authorId, String authorPassword) {
+        Optional<UserDto> optionalFoundUser = userRepository.findUserById(authorId);
+
+        if(optionalFoundUser.isEmpty()) {
+            throw new UserNotFoundException("User for id : " + authorId + "does not exist");
+        }
+
+        if(!authorPassword.equals(optionalFoundUser.get().getPassword())) {
+            throw new UserPasswordMismatchException("user password does not match");
+        }
     }
 
     @Override
@@ -54,11 +74,6 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         String modifiedTask = updateTaskDto.getTask();
         if(modifiedTask != null) {
             taskDto.setTask(modifiedTask);
-        }
-
-        String modifiedAuthor = updateTaskDto.getAuthor();
-        if(modifiedAuthor != null) {
-            taskDto.setAuthor(modifiedAuthor);
         }
 
         taskRepository.updateTask(taskDto);

@@ -8,11 +8,11 @@ public class TaskDtoMapper {
         TaskDto taskDto = new TaskDto();
 
         String task = createTaskDto.getTask();
-        String author = createTaskDto.getAuthor();
+        long authorId = createTaskDto.getAuthorId();
         String password = createTaskDto.getPassword();
 
         taskDto.setTask(task);
-        taskDto.setAuthor(author);
+        taskDto.setAuthorId(authorId);
         taskDto.setPassword(password);
 
         return taskDto;
@@ -22,11 +22,9 @@ public class TaskDtoMapper {
         TaskDto taskDto = new TaskDto();
 
         String task = updateTaskDto.getTask();
-        String author = updateTaskDto.getAuthor();
         String password = updateTaskDto.getPassword();
 
         taskDto.setTask(task);
-        taskDto.setAuthor(author);
         taskDto.setPassword(password);
 
         return taskDto;

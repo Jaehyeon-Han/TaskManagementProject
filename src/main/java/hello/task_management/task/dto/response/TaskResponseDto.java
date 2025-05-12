@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class TaskResponseDto {
     private Long id;
     private String task;
-    private String author;
+    private Long authorId;
+    private String authorName;
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
 }

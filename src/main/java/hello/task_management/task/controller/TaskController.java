@@ -4,7 +4,6 @@ import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.DeleteTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
 import hello.task_management.task.dto.response.TaskResponseDto;
-import hello.task_management.global.error.exception.PasswordMismatchException;
 import hello.task_management.global.error.exception.TaskNotFoundException;
 import hello.task_management.task.service.TaskService;
 import jakarta.validation.Valid;
