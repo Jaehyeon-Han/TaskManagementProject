@@ -72,6 +72,13 @@ public class TaskRepositoryImpl implements TaskRepository {
        return jdbcTemplate.update(sql, taskDto.getTask(), taskDto.getAuthor(), taskDto.getId());
     }
 
+    @Override
+    public void deleteTaskById(long taskId) {
+        String sql = "DELETE FROM tasks WHERE task_id = ?";
+
+        jdbcTemplate.update(sql, taskId);
+    }
+
     private RowMapper<TaskDto> taskDtoRowMapper() {
         return (rs, rowNum) -> {
             return new TaskDto(

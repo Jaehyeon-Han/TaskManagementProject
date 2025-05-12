@@ -14,4 +14,6 @@ public interface TaskRepository {
     List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate);
 
     int updateTask(TaskDto taskDto);
+
+    void deleteTaskById(long taskId);
 }

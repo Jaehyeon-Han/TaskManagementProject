@@ -1,6 +1,7 @@
 package hello.task_management.service;
 
 import hello.task_management.dto.request.CreateTaskDto;
+import hello.task_management.dto.request.DeleteTaskDto;
 import hello.task_management.dto.request.UpdateTaskDto;
 import hello.task_management.dto.response.TaskResponseDto;
 
@@ -16,4 +17,6 @@ public interface TaskService {
     List<TaskResponseDto> findAllTasks(String author, LocalDate lastModifiedDate);
 
     TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto);
+
+    void deleteTaskById(long taskId, DeleteTaskDto deleteTaskDto);
 }
