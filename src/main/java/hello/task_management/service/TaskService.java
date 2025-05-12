@@ -3,16 +3,17 @@ package hello.task_management.service;
 import hello.task_management.dto.request.CreateTaskDto;
 import hello.task_management.dto.request.UpdateTaskDto;
 import hello.task_management.dto.response.TaskResponseDto;
-import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskService {
     TaskResponseDto createTask(CreateTaskDto createTaskDto);
 
     TaskResponseDto findTaskById(long id);
 
-    public List<TaskResponseDto> findAllTasks();
+    List<TaskResponseDto> findAllTasks(String author, LocalDate lastModifiedDate);
 
     TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto);
 }

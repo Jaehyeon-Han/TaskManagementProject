@@ -7,10 +7,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @Repository
 public class TaskRepositoryImpl implements TaskRepository {
@@ -44,11 +42,28 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public List<TaskDto> findAllTasks() {
-        String sql = "SELECT task_id, task, author, password, created_at, last_modified_at FROM tasks ORDER BY last_modified_at DESC";
+    public List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT task_id, task, author, password, created_at, last_modified_at FROM tasks WHERE 1=1"
+        );
 
-        return jdbcTemplate.query(sql, taskDtoRowMapper());
+        List<Object> params = new ArrayList<>();
+
+        if (authorName != null) {
+            sql.append(" AND author = ?");
+            params.add(authorName);
+        }
+
+        if (lastModifiedDate != null) {
+            sql.append(" AND DATE(last_modified_at) = ?");
+            params.add(lastModifiedDate);
+        }
+
+        sql.append(" ORDER BY last_modified_at DESC");
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(), taskDtoRowMapper());
     }
+
 
     @Override
     public int updateTask(TaskDto taskDto) {
