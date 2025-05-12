@@ -12,8 +12,11 @@ import hello.task_management.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static hello.task_management.service.validation.PasswordMatcher.*;
 
@@ -31,13 +34,15 @@ public class TaskServiceImpl implements TaskService {
         return mapTaskDtoToTaskResponseDto(createdTask);
     }
 
+    @Override
     public TaskResponseDto findTaskById(long taskId) {
         TaskDto foundTask = findByIdOrThrowTaskNotFound(taskId);
         return mapTaskDtoToTaskResponseDto(foundTask);
     }
 
-    public List<TaskResponseDto> findAllTasks() {
-        List<TaskDto> allTasks = taskRepository.findAllTasks();
+    @Override
+    public List<TaskResponseDto> findAllTasks(String author, LocalDate lastModifiedDate) {
+        List<TaskDto> allTasks = taskRepository.findAllTasks(author, lastModifiedDate);
         return allTasks.stream().map(TaskResponseDtoMapper::fromTaskDto).toList();
     }
 

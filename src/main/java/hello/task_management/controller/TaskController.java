@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +66,9 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDto>> findAllTasks() {
-        return ResponseEntity.ok(taskService.findAllTasks());
+    public ResponseEntity<List<TaskResponseDto>> findAllTasks(@RequestParam(required = false) String author,
+                                                              @RequestParam(required = false) LocalDate lastModifiedDate) {
+        return ResponseEntity.ok(taskService.findAllTasks(author, lastModifiedDate));
     }
 
     @GetMapping("/{taskId}")
