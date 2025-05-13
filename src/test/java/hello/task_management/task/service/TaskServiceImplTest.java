@@ -24,7 +24,7 @@ class TaskServiceImplTest {
         CreateTaskDto createTaskDto = new CreateTaskDto();
         createTaskDto.setTask("task");
         createTaskDto.setAuthor("author");
-        createTaskDto.setPassword("password");
+        createTaskDto.setTaskPassword("password");
 
         // when
         TaskResponseDto createdTaskResponseDto = taskService.createTask(createTaskDto);
@@ -43,12 +43,12 @@ class TaskServiceImplTest {
         CreateTaskDto createTaskDto = new CreateTaskDto();
         createTaskDto.setTask("task");
         createTaskDto.setAuthor("author");
-        createTaskDto.setPassword("password");
+        createTaskDto.setTaskPassword("password");
         TaskResponseDto taskResponseDto = taskService.createTask(createTaskDto);
 
         UpdateTaskDto updateTaskDto = new UpdateTaskDto();
         updateTaskDto.setTask("modified task");
-        updateTaskDto.setPassword("password");
+        updateTaskDto.setTaskPassword("password");
 
         // when
         try {
@@ -72,12 +72,12 @@ class TaskServiceImplTest {
         CreateTaskDto createTaskDto = new CreateTaskDto();
         createTaskDto.setTask("task");
         createTaskDto.setAuthor("author");
-        createTaskDto.setPassword("password");
+        createTaskDto.setTaskPassword("password");
         TaskResponseDto taskResponseDto = taskService.createTask(createTaskDto);
 
         UpdateTaskDto updateTaskDto = new UpdateTaskDto();
         updateTaskDto.setTask("modified task");
-        updateTaskDto.setPassword("invalid password");
+        updateTaskDto.setTaskPassword("invalid password");
 
         // when + then
         long taskId = taskResponseDto.getId();

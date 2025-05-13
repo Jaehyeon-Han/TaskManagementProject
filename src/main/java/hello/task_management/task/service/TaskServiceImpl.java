@@ -7,6 +7,7 @@ import hello.task_management.task.dto.TaskDtoMapper;
 import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.DeleteTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
+import hello.task_management.task.dto.response.PagedTaskResponse;
 import hello.task_management.task.dto.response.TaskResponseDto;
 import hello.task_management.task.dto.response.TaskResponseDtoMapper;
 import hello.task_management.global.error.exception.TaskNotFoundException;
@@ -28,6 +29,20 @@ import static hello.task_management.global.validation.PasswordMatcher.checkPassw
 public class TaskServiceImpl implements hello.task_management.task.service.TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+
+    @Override
+    public PagedTaskResponse findAllTasks(String author, LocalDate lastModifiedDate, int page, int size) {
+        int offset = page * size;
+
+        List<TaskDto> allTasks = taskRepository.findAllTasks(author, lastModifiedDate, size, offset);
+        List<TaskResponseDto> pagedTasks = allTasks.stream().map(TaskResponseDtoMapper::fromTaskDto).toList();
+
+        long totalElements = taskRepository.countTasks();
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        return new PagedTaskResponse(pagedTasks, page, size, totalElements, totalPages);
+    }
 
     @Override
     public TaskResponseDto createTask(CreateTaskDto createTaskDto) {
@@ -58,18 +73,13 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         return mapTaskDtoToTaskResponseDto(foundTask);
     }
 
-    @Override
-    public List<TaskResponseDto> findAllTasks(String author, LocalDate lastModifiedDate) {
-        List<TaskDto> allTasks = taskRepository.findAllTasks(author, lastModifiedDate);
-        return allTasks.stream().map(TaskResponseDtoMapper::fromTaskDto).toList();
-    }
 
     @Override
     @Transactional
     public TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto) {
         TaskDto taskDto = findByIdOrThrowTaskNotFound(taskId);
 
-        checkPasswordMatchOrThrowPasswordMismatch(updateTaskDto.getPassword(), taskDto.getPassword());
+        checkPasswordMatchOrThrowPasswordMismatch(updateTaskDto.getTaskPassword(), taskDto.getPassword());
 
         String modifiedTask = updateTaskDto.getTask();
         if(modifiedTask != null) {
@@ -86,7 +96,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
     public void deleteTaskById(long taskId, DeleteTaskDto deleteTaskDto) {
         TaskDto foundTaskDto = findByIdOrThrowTaskNotFound(taskId);
 
-        checkPasswordMatchOrThrowPasswordMismatch(deleteTaskDto.getPassword(), foundTaskDto.getPassword());
+        checkPasswordMatchOrThrowPasswordMismatch(deleteTaskDto.getTaskPassword(), foundTaskDto.getPassword());
 
         taskRepository.deleteTaskById(taskId);
     }

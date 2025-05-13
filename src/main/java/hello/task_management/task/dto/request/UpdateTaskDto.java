@@ -9,7 +9,7 @@ import lombok.Setter;
 public class UpdateTaskDto {
     private String task;
     @NotBlank
-    private String password;
+    private String taskPassword;
 
     public boolean isEmpty() {
         return task == null;

@@ -47,10 +47,10 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate) {
+    public List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate, int limit, int offset) {
         StringBuilder sql = new StringBuilder(
                 """
-                SELECT task_id, task, u.user_id, u.name AS author_name, password, created_at, last_modified_at
+                SELECT task_id, task, t.author_id, u.name AS author_name, t.password, t.created_at, t.last_modified_at
                 FROM tasks t
                 LEFT JOIN users u ON t.author_id = u.user_id
                 WHERE 1=1
@@ -69,7 +69,12 @@ public class TaskRepositoryImpl implements TaskRepository {
             params.add(lastModifiedDate);
         }
 
-        sql.append(" ORDER BY t.last_modified_at DESC");
+        sql.append("""
+                ORDER BY t.last_modified_at DESC
+                LIMIT ? OFFSET ?
+                """);
+        params.add(limit);
+        params.add(offset);
 
         return jdbcTemplate.query(sql.toString(), params.toArray(), taskDtoRowMapper());
     }
@@ -87,6 +92,13 @@ public class TaskRepositoryImpl implements TaskRepository {
         String sql = "DELETE FROM tasks WHERE task_id = ?";
 
         jdbcTemplate.update(sql, taskId);
+    }
+
+    @Override
+    public long countTasks() {
+        String sql = "SELECT COUNT(*) FROM tasks";
+
+        return jdbcTemplate.queryForObject(sql, Long.class);
     }
 
     private RowMapper<TaskDto> taskDtoRowMapper() {

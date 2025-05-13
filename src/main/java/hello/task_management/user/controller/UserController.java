@@ -20,6 +20,12 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
+        List<UserResponseDto> allUsers = userService.findAllUsers();
+        return ResponseEntity.ok(allUsers);
+    }
+
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid CreateUserDto createUserDto) {
         UserResponseDto createdUser = userService.createUser(createUserDto);
@@ -32,15 +38,9 @@ public class UserController {
         return ResponseEntity.created(location).body(createdUser);
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
-        List<UserResponseDto> allUsers = userService.findAllUsers();
-        return ResponseEntity.ok(allUsers);
-    }
-
     @PatchMapping("/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable long userId, @RequestBody @Valid UpdateUserDto updateUserDto) {
-        if(updateUserDto.isEmpty()) {
+        if (updateUserDto.isEmpty()) {
             return ResponseEntity.badRequest().body("업데이트할 필드가 없습니다.");
         }
 

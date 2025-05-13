@@ -11,9 +11,11 @@ public interface TaskRepository {
 
     Optional<TaskDto> findTaskById(long createdTaskId);
 
-    List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate);
+    List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate, int limit, int offset);
 
     int updateTask(TaskDto taskDto);
 
     void deleteTaskById(long taskId);
+
+    long countTasks();
 }

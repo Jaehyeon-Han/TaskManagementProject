@@ -15,5 +15,5 @@ public class CreateTaskDto {
     @NotBlank
     private String authorPassword;
     @NotBlank
-    private String password;
+    private String taskPassword;
 }

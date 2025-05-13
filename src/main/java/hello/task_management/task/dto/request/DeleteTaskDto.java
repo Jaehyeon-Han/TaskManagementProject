@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 public class DeleteTaskDto {
     @NotEmpty
-    private String password;
+    private String taskPassword;
 }
