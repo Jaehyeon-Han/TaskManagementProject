@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE tasks
 (
     task_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    task             VARCHAR(500) NOT NULL,
+    task             VARCHAR(200) NOT NULL,
     author_id        BIGINT REFERENCES USERS (user_id),
     password         VARCHAR(20)  NOT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
