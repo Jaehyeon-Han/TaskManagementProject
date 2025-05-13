@@ -1,0 +1,425 @@
+openapi: 3.0.4
+info:
+  title: 할일 관리
+  description: |
+    할일과 사용자 관리 API
+  version: 0.1.0
+tags:
+  - name: 할일
+    description: "할일 관련 API"
+  - name: 사용자
+    description: "사용자 관련 API"
+
+paths:
+  # 할일 API
+  /tasks:
+    get:
+      tags:
+      - 할일
+      summary: (조건에 부합하는) 모든 할일 조회
+      description: 저자명과 최종수정일을 기준으로 페이지네이션된 할일 조회
+      operationId: findAllTasks
+      parameters:
+        - name: author
+          description: 작성자 이름
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lastModifiedDate
+          description: 최종 수정일
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: page
+          description: 요청 페이지 번호
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: pageSize
+          description: 한 페이지의 목록 수
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: 정상 조회
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponse'
+    post:
+      tags:
+      - 할일
+      summary: 새로운 할일 생성
+      operationId: createTaskResponse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: 정상 생성
+          headers:
+            Location:
+              description: 생성된 할일의 URI
+              schema:
+                type: string
+                example: '/tasks/1'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          description: 필드 누락 또는 사용자 id 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldErrorResponse'
+              example:
+                task: 공백일 수 없습니다
+                taskPassword: 공백일 수 없습니다 
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringResponse'
+              example: "User for id 1 does not exist"
+        '401':
+          description: 사용자 pwd 불일치
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringResponse'
+              example: user password does not match
+  /tasks/{taskId}:
+    get:
+      tags:
+        - 할일
+      summary: 할일 단건 조회
+      operationId: findTaskById
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 정상 조회
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '404':
+          description: id에 해당하는 할일 없음
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringResponse'
+              example: Task for id 1 does not exist
+    patch:
+      tags:
+        - 할일
+      summary: 할일 수정
+      operationId: updateTaskById
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: 수정 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          description: task 필드 미제공
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 업데이트할 필드가 없습니다.
+        '403':
+          description: 할일 비밀번호 불일치
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringResponse'
+              example: password does not match
+        '404':
+          description: id에 해당하는 할일 없음
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Task for id 1 does not exist
+    delete:
+      tags:
+      - 할일
+      summary: 할일 삭제
+      operationId: deleteTaskById
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteTaskRequest'
+      responses:
+        '204':
+          description: 정상 삭제
+        '400':
+          description: password 필드 미제공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldErrorResponse'
+              example:
+                password: "비어 있을 수 없습니다"
+        '401':
+          description: 할일 비밀번호 불일치
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StringResponse'
+              example: password does not match 
+        '404':
+          description: id에 해당하는 할일 없음
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Task for id 1 does not exist              
+  
+  # 사용자 API
+  /users:
+    get:
+      tags:
+        - 사용자
+      summary: 모든 사용자 조회
+      responses:
+        '200':
+          description: 모든 사용자 정상 조회
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+    post:
+      tags:
+        - 사용자
+      summary: 새로운 사용자 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: 새로운 사용자 정상 등록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+          headers:
+            Location:
+              description: 생성된 사용자 URI
+              schema:
+                type: string
+                example: "/users/1"
+        '400':
+          description: 필드 누락
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldErrorResponse'
+              example: 
+                email: 공백일 수 없습니다
+
+  /users/{userId}:
+    patch:
+      tags:
+        - 사용자
+      summary: 사용자 정보 변경
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 변경할 사용자의 ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: 사용자 정보 정상 변경
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: name과 email 필드 모두 누락
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StringResponse"
+              example: 업데이트할 필드가 없습니다.
+              
+components:
+  schemas:
+    TaskResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        task:
+          type: string
+          example: create world
+        authorId:
+          type: integer
+          example: 1
+        authorName:
+          type: string
+          example: god
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    CreateTaskRequest:
+      type: object
+      properties:
+        task:
+          type: string
+          example: "new task"
+        authorId:
+          type: integer
+          example: 123
+        authorPassword:
+          type: string
+          example: "author-password"
+        password:
+          type: string
+          example: "password"
+      required:
+        - task
+        - authorId
+        - authorPassword
+        - password
+    UpdateTaskRequest:
+      type: object
+      properties:
+        task:
+          type: string
+          example: "modified task"
+        password:
+          type: string
+          example: "task password"
+      required:
+        - password
+    DeleteTaskRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          example: "task password"
+      required:
+        - password
+    FieldErrorResponse:
+      type: object
+      additionalProperties:
+        type: string
+    StringResponse:
+      type: string
+      
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "god"
+        email:
+          type: string
+          example: "iamgod@lettherebe.world"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-05-13T00:00:00"
+        lastModifiedAt:
+          type: string
+          format: date-time
+          example: "2025-05-13T00:00:00"
+
+    CreateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "new god"
+        email:
+          type: string
+          example: "new_god@hello.world"
+        password:
+          type: string
+          example: "password123"
+      required:
+        - name
+        - email
+        - password
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "updated god"
+        email:
+          type: string
+          example: "updated_god@wholenew.world"
+        password:
+          type: string
+          example: "new_password123"
+      required:
+        - password          
+          
+          
+          
+      
+      
+      
+      
