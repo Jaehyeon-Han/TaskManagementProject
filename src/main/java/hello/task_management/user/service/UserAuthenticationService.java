@@ -15,6 +15,9 @@ public class UserAuthenticationService {
 
     private final UserRepository userRepository;
 
+    // 사용자를 찾아서 비밀번호를 검증하는 역할만 수행한다
+    // UserService에 넣어도 되지만 기존 구현이 UserResponseDto를 반환하도록 구현하였기에
+    // 수정하지 않기 위해 새로 클래스를 생성하였다
     public UserDto authenticateUserOrThrowUserExceptions(long authorId, String authorPassword) {
         Optional<UserDto> optionalFoundUser = userRepository.findUserById(authorId);
 

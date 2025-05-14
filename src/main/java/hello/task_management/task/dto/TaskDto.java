@@ -13,16 +13,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskDto {
-    private Long id;
+    private Long id; // task_id
 
-    private String task;
-    private long authorId;
+    private String task; // 할일 내용
+    private long authorId; // users 테이블에 등록된 user_id
     private String authorName;
 
     private String password;
 
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
+
 
     public static TaskDto fromCreateTaskDto(CreateTaskDto createTaskDto) {
         TaskDto taskDto = new TaskDto();

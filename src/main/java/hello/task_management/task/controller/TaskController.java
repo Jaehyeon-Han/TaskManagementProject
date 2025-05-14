@@ -22,6 +22,9 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
 public class TaskController {
+
+    // TaskController에서 유저를 찾지 못하는 경우는
+    // 잘못된 task_id를 입력한 경우이기 때문에 NOT_FOUND가 아닌 BAD_REQUEST를 던진다
     @ExceptionHandler
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -34,6 +37,8 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    // /pages 경로로 별도로 매핑할 수 있지만
+    // URI는 리소스를 식별해야 한다는 원칙을 따라 /tasks에 매핑한다
     @GetMapping
     public ResponseEntity<PagedTaskResponse> findAllTasks(@RequestParam(required = false) String author,
                                                           @RequestParam(required = false) LocalDate lastModifiedDate,
@@ -47,6 +52,7 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> createTask(@RequestBody @Valid CreateTaskDto createTaskDto) {
         TaskResponseDto createdTask = taskService.createTask(createTaskDto);
 
+        // 201 응답은 location 헤더를 제공해야 한다
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -62,6 +68,7 @@ public class TaskController {
 
     @PatchMapping("/{taskId}")
     public ResponseEntity<?> updateTaskById(@PathVariable long taskId, @RequestBody @Valid UpdateTaskDto updateTaskDto) {
+        // 별도의 예외로 만들어도 좋을 것 같다
         if(updateTaskDto.isEmpty()) {
             return ResponseEntity.badRequest().body("업데이트할 필드가 없습니다.");
         }

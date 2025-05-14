@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public class UpdateUserDto {
-    private String name;
 
+    private String name;
     @Email
     private String email;
     @NotBlank

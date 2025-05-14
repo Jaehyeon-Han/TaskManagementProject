@@ -16,6 +16,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 빈 검증에 실패할 시, BindingResult를 받아서 메시지를 Map 형식으로 반환한다.
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
