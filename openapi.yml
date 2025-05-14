@@ -14,11 +14,11 @@ paths:
   # 할일 API
   /tasks:
     get:
+      operationId: findAllTasks
       tags:
       - 할일
       summary: (조건에 부합하는) 모든 할일 조회
       description: 저자명과 최종수정일을 기준으로 페이지네이션된 할일 조회
-      operationId: findAllTasks
       parameters:
         - name: author
           description: 작성자 이름
@@ -55,12 +55,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TaskResponse'
+                  $ref: '#/components/schemas/PagedTasksResponse'
     post:
       tags:
       - 할일
       summary: 새로운 할일 생성
-      operationId: createTaskResponse
+      operationId: createTask
       requestBody:
         required: true
         content:
@@ -92,14 +92,15 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/StringResponse'
-              example: "User for id 1 does not exist"
-        '401':
+              example: "User for id 2 does not exist"
+        '403':
           description: 사용자 pwd 불일치
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/StringResponse'
               example: user password does not match
+              
   /tasks/{taskId}:
     get:
       tags:
@@ -192,14 +193,14 @@ paths:
         '204':
           description: 정상 삭제
         '400':
-          description: password 필드 미제공
+          description: taskPassword 필드 미제공
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FieldErrorResponse'
               example:
-                password: "비어 있을 수 없습니다"
-        '401':
+                taskPassword: "비어 있을 수 없습니다"
+        '403':
           description: 할일 비밀번호 불일치
           content:
             text/plain:
@@ -217,6 +218,7 @@ paths:
   # 사용자 API
   /users:
     get:
+      operationId: findAllUsers
       tags:
         - 사용자
       summary: 모든 사용자 조회
@@ -230,6 +232,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/UserResponse'
     post:
+      operationId: createUser
       tags:
         - 사용자
       summary: 새로운 사용자 등록
@@ -253,16 +256,18 @@ paths:
                 type: string
                 example: "/users/1"
         '400':
-          description: 필드 누락
+          description: 필드 누락 또는 이메일 형식 오류
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FieldErrorResponse'
               example: 
-                email: 공백일 수 없습니다
+                name: 공백일 수 없습니다
+                email: 올바른 형식의 이메일 주소여야 합니다
 
   /users/{userId}:
     patch:
+      operationId: updateUser
       tags:
         - 사용자
       summary: 사용자 정보 변경
@@ -290,10 +295,24 @@ paths:
         '400':
           description: name과 email 필드 모두 누락
           content:
-            application/json:
+            text/plain:
               schema:
                 $ref: "#/components/schemas/StringResponse"
-              example: 업데이트할 필드가 없습니다.
+              example: "업데이트할 필드가 없습니다."
+        '403': 
+          description: 비밀번호 불일치
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/StringResponse"
+              example: "user password does not match"
+        '404':
+          description: 해당 id에 해당하는 사용자 없음
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/StringResponse"
+              example: "User for id : 2 does not exist"
               
 components:
   schemas:
@@ -318,45 +337,50 @@ components:
         lastModifiedAt:
           type: string
           format: date-time
+          
     CreateTaskRequest:
       type: object
       properties:
         task:
           type: string
+          maxLength: 200
           example: "new task"
+        taskPassword:
+          type: string
+          example: "task password"
         authorId:
           type: integer
           example: 123
         authorPassword:
           type: string
-          example: "author-password"
-        password:
-          type: string
-          example: "password"
+          example: "author password"
       required:
         - task
+        - taskPassword
         - authorId
         - authorPassword
-        - password
+        
     UpdateTaskRequest:
       type: object
       properties:
         task:
           type: string
           example: "modified task"
-        password:
+        taskPassword:
           type: string
           example: "task password"
       required:
-        - password
+        - taskPassword
+        
     DeleteTaskRequest:
       type: object
       properties:
-        password:
+        taskPassword:
           type: string
           example: "task password"
       required:
-        - password
+        - taskPassword
+        
     FieldErrorResponse:
       type: object
       additionalProperties:
@@ -394,6 +418,7 @@ components:
         email:
           type: string
           example: "new_god@hello.world"
+          format: email
         password:
           type: string
           example: "password123"
@@ -411,12 +436,33 @@ components:
         email:
           type: string
           example: "updated_god@wholenew.world"
+          format: email
         password:
           type: string
           example: "new_password123"
       required:
         - password          
-          
+        
+    PagedTasksResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponse'
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10          
+    
           
           
       
