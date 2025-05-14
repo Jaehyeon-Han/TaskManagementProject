@@ -5,7 +5,6 @@ import hello.task_management.user.dto.UserDto;
 import hello.task_management.user.dto.request.CreateUserDto;
 import hello.task_management.user.dto.request.UpdateUserDto;
 import hello.task_management.user.dto.response.UserResponseDto;
-import hello.task_management.user.dto.response.UserResponseDtoMapper;
 import hello.task_management.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDto> findAllUsers() {
-        return userRepository.findAllUsers().stream().map(UserResponseDtoMapper::fromUserDto).toList();
+        return userRepository.findAllUsers().stream().map(UserResponseDto::fromUserDto).toList();
     }
 
     @Override
@@ -61,6 +60,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponseDto mapUserDtoToUserResponseDto(UserDto userDto) {
-        return UserResponseDtoMapper.fromUserDto(userDto);
+        return UserResponseDto.fromUserDto(userDto);
     }
 }

@@ -1,25 +1,20 @@
 package hello.task_management.task.service;
 
-import hello.task_management.global.error.exception.UserNotFoundException;
-import hello.task_management.global.error.exception.UserPasswordMismatchException;
+import hello.task_management.global.error.exception.TaskNotFoundException;
 import hello.task_management.task.dto.TaskDto;
 import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.DeleteTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
 import hello.task_management.task.dto.response.PagedTaskResponse;
 import hello.task_management.task.dto.response.TaskResponseDto;
-import hello.task_management.task.dto.response.TaskResponseDtoMapper;
-import hello.task_management.global.error.exception.TaskNotFoundException;
 import hello.task_management.task.repository.TaskRepository;
-import hello.task_management.user.dto.UserDto;
-import hello.task_management.user.repository.UserRepository;
+import hello.task_management.user.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static hello.task_management.global.validation.PasswordMatcher.checkPasswordMatchOrThrowPasswordMismatch;
 
@@ -27,14 +22,14 @@ import static hello.task_management.global.validation.PasswordMatcher.checkPassw
 @RequiredArgsConstructor
 public class TaskServiceImpl implements hello.task_management.task.service.TaskService {
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
+    private final UserAuthenticationService userAuthenticationService;
 
     @Override
     public PagedTaskResponse findAllTasks(String author, LocalDate lastModifiedDate, int page, int size) {
         int offset = page * size;
 
         List<TaskDto> allTasks = taskRepository.findAllTasks(author, lastModifiedDate, size, offset);
-        List<TaskResponseDto> pagedTasks = allTasks.stream().map(TaskResponseDtoMapper::fromTaskDto).toList();
+        List<TaskResponseDto> pagedTasks = allTasks.stream().map(TaskResponseDto::fromTaskDto).toList();
 
         long totalElements = taskRepository.countTasks();
 
@@ -45,7 +40,10 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
 
     @Override
     public TaskResponseDto createTask(CreateTaskDto createTaskDto) {
-        authenticateAuthorOrThrowUserPasswordMismatchException(createTaskDto.getAuthorId(), createTaskDto.getAuthorPassword());
+        long userId = createTaskDto.getAuthorId();
+        String userPassword = createTaskDto.getAuthorPassword();
+
+        userAuthenticationService.authenticateUserOrThrowUserExceptions(userId, userPassword);
 
         TaskDto newTaskDto = TaskDto.fromCreateTaskDto(createTaskDto);
         long createdTaskId = taskRepository.createTask(newTaskDto);
@@ -68,7 +66,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         checkPasswordMatchOrThrowPasswordMismatch(updateTaskDto.getTaskPassword(), taskDto.getPassword());
 
         String modifiedTask = updateTaskDto.getTask();
-        if(modifiedTask != null) {
+        if (modifiedTask != null) {
             taskDto.setTask(modifiedTask);
         }
 
@@ -87,25 +85,13 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         taskRepository.deleteTaskById(taskId);
     }
 
-    private void authenticateAuthorOrThrowUserPasswordMismatchException(Long authorId, String authorPassword) {
-        Optional<UserDto> optionalFoundUser = userRepository.findUserById(authorId);
-
-        if(optionalFoundUser.isEmpty()) {
-            throw new UserNotFoundException("User for id : " + authorId + "does not exist");
-        }
-
-        if(!authorPassword.equals(optionalFoundUser.get().getPassword())) {
-            throw new UserPasswordMismatchException("user password does not match");
-        }
-    }
-
     private TaskDto findTaskByIdOrThrowTaskNotFoundException(long taskId) {
         return taskRepository.findTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task for id " + taskId + " does not exist"));
     }
 
     private TaskResponseDto mapTaskDtoToTaskResponseDto(TaskDto taskDto) {
-        return TaskResponseDtoMapper.fromTaskDto(taskDto);
+        return TaskResponseDto.fromTaskDto(taskDto);
     }
 
 }
