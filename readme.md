@@ -6,7 +6,7 @@ openapi.yml 파일 참고 요망
 
 # ERD
 
-![erd_with_users.png](D:\WebProgramming\BootCamp\ch3\task-management\images\erd_with_users.png)
+![erd_with_users.png](images/erd_with_users.png)
 
 ---
 
