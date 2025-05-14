@@ -51,8 +51,41 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         TaskDto newTaskDto = TaskDtoMapper.fromCreateTaskDto(createTaskDto);
         long createdTaskId = taskRepository.createTask(newTaskDto);
 
-        TaskDto createdTask = findByIdOrThrowTaskNotFound(createdTaskId);
+        TaskDto createdTask = findTaskByIdOrThrowTaskNotFoundException(createdTaskId);
         return mapTaskDtoToTaskResponseDto(createdTask);
+    }
+
+    @Override
+    public TaskResponseDto findTaskById(long taskId) {
+        TaskDto foundTask = findTaskByIdOrThrowTaskNotFoundException(taskId);
+        return mapTaskDtoToTaskResponseDto(foundTask);
+    }
+
+    @Override
+    @Transactional
+    public TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto) {
+        TaskDto taskDto = findTaskByIdOrThrowTaskNotFoundException(taskId);
+
+        checkPasswordMatchOrThrowPasswordMismatch(updateTaskDto.getTaskPassword(), taskDto.getPassword());
+
+        String modifiedTask = updateTaskDto.getTask();
+        if(modifiedTask != null) {
+            taskDto.setTask(modifiedTask);
+        }
+
+        taskRepository.updateTask(taskDto.getTask(), taskDto.getId());
+
+        TaskDto updatedTaskDto = findTaskByIdOrThrowTaskNotFoundException(taskId);
+        return mapTaskDtoToTaskResponseDto(updatedTaskDto);
+    }
+
+    @Override
+    public void deleteTaskById(long taskId, DeleteTaskDto deleteTaskDto) {
+        TaskDto foundTaskDto = findTaskByIdOrThrowTaskNotFoundException(taskId);
+
+        checkPasswordMatchOrThrowPasswordMismatch(deleteTaskDto.getTaskPassword(), foundTaskDto.getPassword());
+
+        taskRepository.deleteTaskById(taskId);
     }
 
     private void authenticateAuthorOrThrowUserPasswordMismatchException(Long authorId, String authorPassword) {
@@ -67,41 +100,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         }
     }
 
-    @Override
-    public TaskResponseDto findTaskById(long taskId) {
-        TaskDto foundTask = findByIdOrThrowTaskNotFound(taskId);
-        return mapTaskDtoToTaskResponseDto(foundTask);
-    }
-
-
-    @Override
-    @Transactional
-    public TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto) {
-        TaskDto taskDto = findByIdOrThrowTaskNotFound(taskId);
-
-        checkPasswordMatchOrThrowPasswordMismatch(updateTaskDto.getTaskPassword(), taskDto.getPassword());
-
-        String modifiedTask = updateTaskDto.getTask();
-        if(modifiedTask != null) {
-            taskDto.setTask(modifiedTask);
-        }
-
-        taskRepository.updateTask(taskDto);
-
-        TaskDto updatedTaskDto = findByIdOrThrowTaskNotFound(taskId);
-        return mapTaskDtoToTaskResponseDto(updatedTaskDto);
-    }
-
-    @Override
-    public void deleteTaskById(long taskId, DeleteTaskDto deleteTaskDto) {
-        TaskDto foundTaskDto = findByIdOrThrowTaskNotFound(taskId);
-
-        checkPasswordMatchOrThrowPasswordMismatch(deleteTaskDto.getTaskPassword(), foundTaskDto.getPassword());
-
-        taskRepository.deleteTaskById(taskId);
-    }
-
-    private TaskDto findByIdOrThrowTaskNotFound(long taskId) {
+    private TaskDto findTaskByIdOrThrowTaskNotFoundException(long taskId) {
         return taskRepository.findTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task for id " + taskId + " does not exist"));
     }
@@ -109,4 +108,5 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
     private TaskResponseDto mapTaskDtoToTaskResponseDto(TaskDto taskDto) {
         return TaskResponseDtoMapper.fromTaskDto(taskDto);
     }
+
 }

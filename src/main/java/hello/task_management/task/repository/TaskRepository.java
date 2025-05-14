@@ -13,7 +13,7 @@ public interface TaskRepository {
 
     List<TaskDto> findAllTasks(String authorName, LocalDate lastModifiedDate, int limit, int offset);
 
-    int updateTask(TaskDto taskDto);
+    int updateTask(String task, long taskId);
 
     void deleteTaskById(long taskId);
 

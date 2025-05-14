@@ -1,0 +1,1 @@
+INSERT INTO users (name, email, password) VALUES ("god", "god@heaven", "genesis");
