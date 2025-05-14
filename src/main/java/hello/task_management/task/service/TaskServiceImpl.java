@@ -29,13 +29,12 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         int offset = page * size;
 
         List<TaskDto> allTasks = taskRepository.findAllTasks(author, lastModifiedDate, size, offset);
-        List<TaskResponseDto> pagedTasks = allTasks.stream().map(TaskResponseDto::fromTaskDto).toList();
+        List<TaskResponseDto> allTasksResponse = allTasks.stream().map(TaskResponseDto::fromTaskDto).toList();
 
         long totalElements = taskRepository.countTasks();
-
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        return new PagedTaskResponse(pagedTasks, page, size, totalElements, totalPages);
+        return new PagedTaskResponse(allTasksResponse, page, size, totalElements, totalPages);
     }
 
     @Override
@@ -43,6 +42,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
         long userId = createTaskDto.getAuthorId();
         String userPassword = createTaskDto.getAuthorPassword();
 
+        // 등록된 사용자만 할일을 등록할 수 있다
         userAuthenticationService.authenticateUserOrThrowUserExceptions(userId, userPassword);
 
         TaskDto newTaskDto = TaskDto.fromCreateTaskDto(createTaskDto);
@@ -59,7 +59,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
     }
 
     @Override
-    @Transactional
+    @Transactional // 수정 도중 예외가 발생하면 롤백
     public TaskResponseDto updateTaskById(long taskId, UpdateTaskDto updateTaskDto) {
         TaskDto taskDto = findTaskByIdOrThrowTaskNotFoundException(taskId);
 
