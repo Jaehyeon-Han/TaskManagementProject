@@ -1,8 +1,10 @@
 package hello.task_management.task.dto;
 
 import hello.task_management.task.dto.request.CreateTaskDto;
-import hello.task_management.task.dto.request.UpdateTaskDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 

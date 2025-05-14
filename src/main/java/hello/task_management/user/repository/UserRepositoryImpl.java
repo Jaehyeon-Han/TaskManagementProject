@@ -1,6 +1,5 @@
 package hello.task_management.user.repository;
 
-import hello.task_management.task.dto.TaskDto;
 import hello.task_management.user.dto.UserDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
