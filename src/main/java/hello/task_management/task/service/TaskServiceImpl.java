@@ -3,7 +3,6 @@ package hello.task_management.task.service;
 import hello.task_management.global.error.exception.UserNotFoundException;
 import hello.task_management.global.error.exception.UserPasswordMismatchException;
 import hello.task_management.task.dto.TaskDto;
-import hello.task_management.task.dto.TaskDtoMapper;
 import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.DeleteTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
@@ -48,7 +47,7 @@ public class TaskServiceImpl implements hello.task_management.task.service.TaskS
     public TaskResponseDto createTask(CreateTaskDto createTaskDto) {
         authenticateAuthorOrThrowUserPasswordMismatchException(createTaskDto.getAuthorId(), createTaskDto.getAuthorPassword());
 
-        TaskDto newTaskDto = TaskDtoMapper.fromCreateTaskDto(createTaskDto);
+        TaskDto newTaskDto = TaskDto.fromCreateTaskDto(createTaskDto);
         long createdTaskId = taskRepository.createTask(newTaskDto);
 
         TaskDto createdTask = findTaskByIdOrThrowTaskNotFoundException(createdTaskId);

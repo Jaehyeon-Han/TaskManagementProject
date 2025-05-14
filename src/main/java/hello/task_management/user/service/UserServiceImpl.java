@@ -2,7 +2,6 @@ package hello.task_management.user.service;
 
 import hello.task_management.global.error.exception.UserNotFoundException;
 import hello.task_management.user.dto.UserDto;
-import hello.task_management.user.dto.UserDtoMapper;
 import hello.task_management.user.dto.request.CreateUserDto;
 import hello.task_management.user.dto.request.UpdateUserDto;
 import hello.task_management.user.dto.response.UserResponseDto;
@@ -22,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto createUser(CreateUserDto createUserDto) {
-        UserDto userToCreate = UserDtoMapper.fromCreateUserDto(createUserDto);
+        UserDto userToCreate = UserDto.fromCreateUserDto(createUserDto);
         long createdUserId = userRepository.createUser(userToCreate);
 
         UserDto createdUser = findByIdOrThrowUserNotFound(createdUserId);
