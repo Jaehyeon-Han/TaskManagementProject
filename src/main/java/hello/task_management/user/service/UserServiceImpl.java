@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static hello.task_management.global.validation.PasswordMatcher.checkPasswordMatchOrThrowPasswordMismatch;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserAuthenticationService userAuthenticationService;
     private final UserRepository userRepository;
 
     @Override
@@ -34,9 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateUserById(long userId, UpdateUserDto updateUserDto) {
-        UserDto userDto = findByIdOrThrowUserNotFound(userId);
-
-        checkPasswordMatchOrThrowPasswordMismatch(updateUserDto.getPassword(), userDto.getPassword());
+        UserDto userDto = userAuthenticationService.authenticateUserOrThrowUserExceptions(userId, updateUserDto.getPassword());
 
         String modifiedName = updateUserDto.getName();
         if(modifiedName != null) {

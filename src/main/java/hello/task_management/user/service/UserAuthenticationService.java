@@ -15,15 +15,17 @@ public class UserAuthenticationService {
 
     private final UserRepository userRepository;
 
-    public void authenticateUserOrThrowUserExceptions(long authorId, String authorPassword) {
+    public UserDto authenticateUserOrThrowUserExceptions(long authorId, String authorPassword) {
         Optional<UserDto> optionalFoundUser = userRepository.findUserById(authorId);
 
         if(optionalFoundUser.isEmpty()) {
-            throw new UserNotFoundException("User for id : " + authorId + "does not exist");
+            throw new UserNotFoundException("User for id : " + authorId + " does not exist");
         }
 
         if(!authorPassword.equals(optionalFoundUser.get().getPassword())) {
             throw new UserPasswordMismatchException("user password does not match");
         }
+
+        return optionalFoundUser.get();
     }
 }

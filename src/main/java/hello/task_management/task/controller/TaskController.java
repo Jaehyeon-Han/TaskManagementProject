@@ -1,6 +1,7 @@
 package hello.task_management.task.controller;
 
 import hello.task_management.global.error.exception.TaskNotFoundException;
+import hello.task_management.global.error.exception.UserNotFoundException;
 import hello.task_management.task.dto.request.CreateTaskDto;
 import hello.task_management.task.dto.request.DeleteTaskDto;
 import hello.task_management.task.dto.request.UpdateTaskDto;
@@ -21,12 +22,17 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
 public class TaskController {
-    private final TaskService taskService;
+    @ExceptionHandler
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 
     @ExceptionHandler
     public ResponseEntity<String> handleTaskNotFoundException(TaskNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    private final TaskService taskService;
 
     @GetMapping
     public ResponseEntity<PagedTaskResponse> findAllTasks(@RequestParam(required = false) String author,
